@@ -3,17 +3,19 @@ var router = express.Router();
 var MongoClient = require('mongodb').MongoClient;
 var bodyParser = require('body-parser');
 var fs = require('fs')
+const MONGODB_URI = 'mongodb+srv://sivithu:caca@cluster0-abdkp.mongodb.net/test?retryWrites=true'
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+
 /* - Liste de tous les clients - */
 router.get('/client', async (req, res) => {
   try {
     // Connection URL
-    const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
     // Database Name
     const dbName = 'spareAPI';
     const client = new MongoClient(url);
@@ -33,7 +35,7 @@ router.get('/client', async (req, res) => {
 router.get('/prestataire', async (req, res) => {
   try {
     // Connection URL
-    const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
     // Database Name
     const dbName = 'spareAPI';
     const client = new MongoClient(url);
@@ -53,7 +55,7 @@ router.get('/prestataire', async (req, res) => {
 router.get('/services', async (req, res) => {
   try {
     // Connection URL
-    const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
     // Database Name
     const dbName = 'spareAPI';
     const client = new MongoClient(url);
@@ -69,11 +71,52 @@ router.get('/services', async (req, res) => {
     console.log(err.stack);
   }
 });
+/* - Liste des services principaux - */
+router.get('/servicesPrincipaux', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('Service');
+    var find = await col.distinct('typeService');//find().toArray();
+    console.log(find);
+    res.send(find);
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
+/* - Check user deja existant - */
+router.get('/:email/checkClient', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    var email = req.params.email;
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('Client');
+    var find = await col.find({email: email}).toArray();
+    console.log(find);
+    res.send(find);
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
 /* - Récupération des informations sur un client - */
 router.get('/:email/:mdp/connexionClient', async (req, res) => {
   try {
     // Connection URL
-    const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
     // Database Name
     const dbName = 'spareAPI';
     const client = new MongoClient(url);
@@ -95,7 +138,7 @@ router.get('/:email/:mdp/connexionClient', async (req, res) => {
 router.get('/:email/:mdp/connexionPrestataire', async (req, res) => {
   try {
     // Connection URL
-    const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
     // Database Name
     const dbName = 'spareAPI';
     const client = new MongoClient(url);
@@ -117,7 +160,7 @@ router.get('/:email/:mdp/connexionPrestataire', async (req, res) => {
 router.post('/:nom/:prenom/:email/:mdp/:tel/ajoutClient', async (req, res) => {
   try {
     // Connection URL
-    const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
     // Database Name
     const dbName = 'spareAPI';
     const client = new MongoClient(url);
@@ -142,7 +185,7 @@ router.post('/:nom/:prenom/:email/:mdp/:tel/ajoutClient', async (req, res) => {
 router.post('/:nom/:prenom/:email/:mdp/:tel/:salaire/ajoutPrestataire', async (req, res) => {
   try {
     // Connection URL
-    const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
     // Database Name
     const dbName = 'spareAPI';
     const client = new MongoClient(url);
@@ -168,16 +211,12 @@ router.post('/:nom/:prenom/:email/:mdp/:tel/:salaire/ajoutPrestataire', async (r
 router.post('/:nom/:type/ajoutService', async (req, res) => {
   try {
     // Connection URL
-    const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
     // Database Name
     const dbName = 'spareAPI';
     const client = new MongoClient(url);
     var nom = req.params.nom;
-    var prenom = req.params.prenom;
-    var email = req.params.email;
-    var tel = req.params.tel;
-    var mdp = req.params.mdp;
-    var salaire = req.params.salaire;
+    var type = req.params.type;
     await client.connect();
     const db = client.db(dbName);
     const col = db.collection('Service');
@@ -194,7 +233,7 @@ router.post('/:nom/:type/ajoutService', async (req, res) => {
 router.delete('/:email/:mdp/supprimerClient', async (req, res) => {
   try {
     // Connection URL
-    const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
     // Database Name
     const dbName = 'spareAPI';
     const client = new MongoClient(url);
@@ -216,7 +255,7 @@ router.delete('/:email/:mdp/supprimerClient', async (req, res) => {
 router.delete('/:email/:mdp/supprimerPrestataire', async (req, res) => {
   try {
     // Connection URL
-    const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
     // Database Name
     const dbName = 'spareAPI';
     const client = new MongoClient(url);
