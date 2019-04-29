@@ -11,6 +11,34 @@ router.get('/', function(req, res, next) {
 });
 
 
+
+
+
+
+
+/* - Liste de tous les Admin - */
+router.get('/admin', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('ADMin');
+    var find = await col.find().toArray();
+    console.log(find);
+    res.send(find);
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
+
+
+
 /* - Liste de tous les clients - */
 router.get('/client', async (req, res) => {
   try {
