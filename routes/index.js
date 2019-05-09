@@ -10,12 +10,6 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
-
-
-
-
-
-
 /* - Liste de tous les Admin - */
 router.get('/admin', async (req, res) => {
   try {
@@ -269,8 +263,40 @@ router.post('/:nom/:type/ajoutService', async (req, res) => {
     await client.connect();
     const db = client.db(dbName);
     const col = db.collection('Service');
-    await col.insertMany([{nomService: nom, typeService: type}]);
+    await col.insert({nomService: nom, typeService: type});
     var check = await col.find({nomService: nom, typeService: type}).toArray();
+    res.send(check);
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
+/* - Création d'un service - */
+router.post('/ajoutAnnonce', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    var email = req.body.email;
+    var serviceName = req.body.serviceName;
+    var subServiceName = req.body.subServiceName;
+    var serviceDescription = req.body.serviceDescription;
+    var serviceAdresse = req.body.serviceAdresse;
+    await client.connect();
+    const db = client.db(dbName);
+    const colClient = db.collection('Client');
+    const colService = db.collection('Service');
+    const colAnnonce = db.collection('Annonce');
+    var checkClient = await colClient.find({email: email}).toArray();
+    var checkService = await colService.find({nomService: subServiceName, typeService: serviceName}).toArray();
+    var idClient = checkClient[0]._id;
+    var idService = checkService[0]._id;
+    await colAnnonce.insert({idClient: idClient, idService: idService, descriptionAnnonce: serviceDescription, detailAnnonce: serviceAdresse});
+
+    var check = await colAnnonce.find().toArray();
     res.send(check);
     client.close();
   } catch (err) {
