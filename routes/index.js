@@ -3,6 +3,7 @@ var router = express.Router();
 var MongoClient = require('mongodb').MongoClient;
 var bodyParser = require('body-parser');
 var fs = require('fs')
+var ObjectId = require('mongodb').ObjectId;
 const MONGODB_URI = 'mongodb+srv://sivithu:caca@cluster0-abdkp.mongodb.net/test?retryWrites=true'
 
 /* GET home page. */
@@ -127,6 +128,27 @@ router.get('/servicesPrincipaux', async (req, res) => {
     const col = db.collection('Service');
     var find = await col.distinct('typeService');//find().toArray();
     console.log(find);
+    res.send(find);
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
+/* - Service Filtrer par id- */
+router.get('/getService', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    var id = req.body.id;
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('Service');
+    var find = await col.find({_id: ObjectId(id)}).toArray();
+    //console.log(find);
     res.send(find);
     client.close();
   } catch (err) {
