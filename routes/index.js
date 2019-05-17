@@ -136,14 +136,14 @@ router.get('/servicesPrincipaux', async (req, res) => {
   }
 });
 /* - Service Filtrer par id- */
-router.get('/getService', async (req, res) => {
+router.get('/getService/:id', async (req, res) => {
   try {
     // Connection URL
     const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
     // Database Name
     const dbName = 'spareAPI';
     const client = new MongoClient(url);
-    var id = req.body.id;
+    var id = req.params.id;
     await client.connect();
     const db = client.db(dbName);
     const col = db.collection('Service');
