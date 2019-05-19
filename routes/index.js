@@ -391,4 +391,28 @@ router.delete('/:email/:mdp/supprimerPrestataire', async (req, res) => {
   }
 });
 
+
+/* - Suppression d'un admin - */
+router.delete('/:email/:mdp/supprimerAdmin', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    var email = req.params.email;
+    var mdp = req.params.mdp;
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('ADMin');
+    var findClient = await col.find({email: email, mdp: mdp});
+    col.deleteOne({email: email, mdp: mdp});
+    res.send("Admin suprimé");
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
+
 module.exports = router;
