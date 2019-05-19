@@ -400,7 +400,7 @@ router.delete('/:email/:mdp/supprimerAdmin', async (req, res) => {
 
 // update un clienat
 
-router.put('/:nom/:prenom/:email/:mdp/:tel/updateClient', async (req, res) => {
+router.put('/:nom/:prenom/updateClient', async (req, res) => {
   try {
     // Connection URL
     const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
@@ -417,6 +417,33 @@ router.put('/:nom/:prenom/:email/:mdp/:tel/updateClient', async (req, res) => {
     const col = db.collection('Client');
     await col.insertMany([{nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel}]);
     var check = await col.find({nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel}).toArray();
+    res.send(check);
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
+
+
+router.put('/:nom/:prenom/updatePrestatire', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    var nom = req.params.nom;
+    var prenom = req.params.prenom;
+    var email = req.params.email;
+    var tel = req.params.tel;
+    var mdp = req.params.mdp;
+    var salaire = req.params.salaire;
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('Prestataire');
+    await col.insertMany([{nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel, salaire: salaire}]);
+    var check = await col.find({nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel, salaire: salaire}).toArray();
     res.send(check);
     client.close();
   } catch (err) {
