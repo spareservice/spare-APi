@@ -76,7 +76,7 @@ router.get('/prestataire', async (req, res) => {
 });
 
 
-
+/* - Recupère la liste de service par type de service - */
 router.get('/services', async (req, res) => {
   try {
     // Connection URL
@@ -97,6 +97,7 @@ router.get('/services', async (req, res) => {
     console.log(err.stack);
   }
 });
+
 /* - Liste des services principaux - */
 router.get('/servicesPrincipaux', async (req, res) => {
   try {
@@ -129,6 +130,27 @@ router.get('/getService/:id', async (req, res) => {
     await client.connect();
     const db = client.db(dbName);
     const col = db.collection('Service');
+    var find = await col.find({_id: ObjectId(id)}).toArray();
+    //console.log(find);
+    res.send(find);
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
+/* - Client Filtrer par id- */
+router.get('/getClient/:id', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    var id = req.params.id;
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('Client');
     var find = await col.find({_id: ObjectId(id)}).toArray();
     //console.log(find);
     res.send(find);
