@@ -271,7 +271,7 @@ router.post('/:nom/:prenom/:email/:mdp/:tel/ajoutClient', async (req, res) => {
   }
 });
 /* - Création d'un prestataire - */
-router.post('/:nom/:prenom/:email/:mdp/:tel/:salaire/ajoutPrestataire', async (req, res) => {
+router.post('/:nom/:prenom/:email/:mdp/:tel/ajoutPrestataire', async (req, res) => {
   try {
     // Connection URL
     const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
@@ -283,12 +283,11 @@ router.post('/:nom/:prenom/:email/:mdp/:tel/:salaire/ajoutPrestataire', async (r
     var email = req.params.email;
     var tel = req.params.tel;
     var mdp = req.params.mdp;
-    var salaire = req.params.salaire;
     await client.connect();
     const db = client.db(dbName);
     const col = db.collection('Prestataire');
-    await col.insertMany([{nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel, salaire: salaire}]);
-    var check = await col.find({nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel, salaire: salaire}).toArray();
+    await col.insertMany([{nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel}]);
+    var check = await col.find({nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel}).toArray();
     res.send(check);
     client.close();
   } catch (err) {
