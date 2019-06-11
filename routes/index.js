@@ -286,7 +286,7 @@ router.post('/:nom/:prenom/:email/:mdp/:tel/:adresse/:cp/:ville/ajoutPrestataire
     const db = client.db(dbName);
     const col = db.collection('Prestataire');
     await col.insertMany([{nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel, adresse: adresse, cp: cp, ville: ville}]);
-    var check = await col.find({nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel}).toArray();
+    var check = await col.find({nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel, adresse: adresse, cp: cp, ville: ville}).toArray();
     res.send(check);
     client.close();
   } catch (err) {
