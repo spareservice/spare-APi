@@ -74,27 +74,9 @@ router.get('/prestataire', async (req, res) => {
     console.log(err.stack);
   }
 });
-/* - Liste de tous les services - */
-/*router.get('/services', async (req, res) => {
-  try {
-    // Connection URL
-    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
-    // Database Name
-    const dbName = 'spareAPI';
-    const client = new MongoClient(url);
-    await client.connect();
-    const db = client.db(dbName);
-    const col = db.collection('Service');
-    var find = await col.find().toArray();
-    console.log(find);
-    res.send(find);
-    client.close();
-  } catch (err) {
-    //this will eventually be handled by your error handling middleware
-    console.log(err.stack);
-  }
-});
-/* - Liste de tous les services avec service principal- */
+
+
+/* - Recupère la liste de service par type de service - */
 router.get('/services', async (req, res) => {
   try {
     // Connection URL
@@ -115,6 +97,7 @@ router.get('/services', async (req, res) => {
     console.log(err.stack);
   }
 });
+
 /* - Liste des services principaux - */
 router.get('/servicesPrincipaux', async (req, res) => {
   try {
@@ -147,6 +130,27 @@ router.get('/getService/:id', async (req, res) => {
     await client.connect();
     const db = client.db(dbName);
     const col = db.collection('Service');
+    var find = await col.find({_id: ObjectId(id)}).toArray();
+    //console.log(find);
+    res.send(find);
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
+/* - Client Filtrer par id- */
+router.get('/getClient/:id', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    var id = req.params.id;
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('Client');
     var find = await col.find({_id: ObjectId(id)}).toArray();
     //console.log(find);
     res.send(find);
@@ -392,5 +396,91 @@ router.delete('/:email/:mdp/supprimerPrestataire', async (req, res) => {
     console.log(err.stack);
   }
 });
+
+
+/* - Suppression d'un admin - */
+router.delete('/:email/:mdp/supprimerAdmin', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    var email = req.params.email;
+    var mdp = req.params.mdp;
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('ADMin');
+    var findClient = await col.find({email: email, mdp: mdp});
+    col.deleteOne({email: email, mdp: mdp});
+    res.send("Admin suprimé");
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
+
+
+// update un clienat
+
+router.put('/:nom/:prenom/updateClient', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    var nom = req.params.nom;
+    var prenom = req.params.prenom;
+    var email = req.params.email;
+    var tel = req.params.tel;
+    var mdp = req.params.mdp;
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('Client');
+    await col.insertMany([{nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel}]);
+    var check = await col.find({nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel}).toArray();
+    res.send(check);
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
+
+
+router.put('/:nom/:prenom/updatePrestatire', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    var nom = req.params.nom;
+    var prenom = req.params.prenom;
+    var email = req.params.email;
+    var tel = req.params.tel;
+    var mdp = req.params.mdp;
+    var salaire = req.params.salaire;
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('Prestataire');
+    await col.insertMany([{nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel, salaire: salaire}]);
+    var check = await col.find({nom: nom, prenom: prenom, email: email, mdp: mdp, tel: tel, salaire: salaire}).toArray();
+    res.send(check);
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+});
+
+
+
+
+
+
+
 
 module.exports = router;
