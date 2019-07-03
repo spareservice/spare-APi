@@ -596,6 +596,8 @@ router.post('/ajoutAnnonce', async (req, res) => {
     var subServiceName = req.body.subServiceName;
     var serviceDescription = req.body.serviceDescription;
     var serviceAdresse = req.body.serviceAdresse;
+    var debutDate = req.body.debutDate;
+    var debutHeure = req.body.debutHeure;
     await client.connect();
     const db = client.db(dbName);
     const colClient = db.collection('Client');
@@ -605,7 +607,7 @@ router.post('/ajoutAnnonce', async (req, res) => {
     var checkService = await colService.find({nomService: subServiceName, typeService: serviceName}).toArray();
     var idClient = checkClient[0]._id;
     var idService = checkService[0]._id;
-    await colAnnonce.insert({idClient: idClient, idService: idService, descriptionAnnonce: serviceDescription, detailAnnonce: serviceAdresse});
+    await colAnnonce.insert({idClient: idClient, idService: idService, descriptionAnnonce: serviceDescription, detailAnnonce: serviceAdresse, debutDate: debutDate, debutHeure: debutHeure});
 
     var check = await colAnnonce.find().toArray();
     res.send(check);
