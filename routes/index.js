@@ -17,7 +17,7 @@ router.get('/', function(req, res, next) {
 });
 
 
-
+/* - GET METHIOD - */
 
 /* - Liste de tous les Admin - */
 router.get('/admin', async (req, res) => {
@@ -471,12 +471,7 @@ router.get('/connexionPrestataire', async (req, res) => {
 });
 
 
-
-
-
-
-
-
+/* - POST METHOD - */
 
 /* - Création d'un client - */
 router.post('/:nom/:prenom/:email/:mdp/:tel/ajoutClient', async (req, res) => {
@@ -630,12 +625,13 @@ router.post('/ajoutMission', async (req, res) => {
     var idPrestataire = req.query.idPrestataire;
     var debutDate = req.query.debutDate;
     var debutHeure = req.query.debutHeure;
+    var infoPrestataire = req.query.infoPrestataire;
     var isValide = req.query.isValide;
     var inProcess = req.query.inProcess;
     await client.connect();
     const db = client.db(dbName);
     const col = db.collection('Mission');
-    await col.insert({_idAnnonce: idAnnonce, _idClient: idClient, _idPrestataire: idPrestataire, debutDate: debutDate, debutHeure: debutHeure, isValide: isValide, inProcess: inProcess});
+    await col.insert({_idAnnonce: idAnnonce, _idClient: idClient, _idPrestataire: idPrestataire, debutDate: debutDate, debutHeure: debutHeure, infoPrestataire: infoPrestataire, isValide: isValide, inProcess: inProcess});
 
     var check = await col.find({idAnnonce: idAnnonce, idClient: idClient, idPrestataire: idPrestataire, debutDate: debutDate, debutHeure: debutHeure, isValide: isValide, inProcess: inProcess}).toArray();
     res.send(check);
@@ -645,6 +641,34 @@ router.post('/ajoutMission', async (req, res) => {
     console.log(err.stack);
   }
 });
+
+
+/* - UPDATE METHOD - */
+
+/* - Mettre à jour la table Mission - */
+router.patch('/missionChangeIsValide/:idMission', async (req, res) => {
+  try {
+    // Connection URL
+    const url = MONGODB_URI || 'mongodb://localhost:27017/spareAPI';
+    // Database Name
+    const dbName = 'spareAPI';
+    const client = new MongoClient(url);
+    var idMission = req.params.idMission;
+    var isValide = req.body;
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection('Mission');col.update({_id: ObjectId(idMission)}, {$set: isValide});
+    var find = await col.find({_id: ObjectId(idMission)}).toArray();
+    res.send(find);
+    client.close();
+  } catch (err) {
+    //this will eventually be handled by your error handling middleware
+    console.log(err.stack);
+  }
+})
+
+/* - DELETE METHOD - */
+
 /* - Suppression d'un client - */
 router.delete('/:email/:mdp/supprimerClient', async (req, res) => {
   try {
